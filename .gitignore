@@ -1,0 +1,146 @@
+#####################################################
+# 👾 IDE & Editor Garbage
+#####################################################
+
+# Rider
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+.idea/workspace.xml
+.idea/modules.xml
+.idea/.idea.*
+.idea/**
+
+# Visual Studio & VSCode
+.vscode/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS for Mac
+*.pidb
+*.userprefs
+
+# JetBrains
+*.DotSettings.user
+_ReSharper.*
+*.[Rr]e[Ss]harper
+resharper-host/
+
+# MonoDevelop
+*.userprefs
+
+#####################################################
+# 💾 Build Artifacts
+#####################################################
+
+bin/
+obj/
+out/
+debug/
+release/
+build/
+BuildArtifacts/
+dist/
+build.log
+
+# .NET Core
+*.exe
+*.dll
+*.pdb
+*.log
+*.cache
+*.csproj.user
+
+# NuGet
+packages/
+*.nupkg
+.nuget/
+project.lock.json
+project.assets.json
+PackageRestoreFailed.*
+
+#####################################################
+# 🧪 Test & Coverage Artifacts
+#####################################################
+
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.coveragexml
+*.testlog
+*.log
+
+#####################################################
+# 💽 Databases & Dumps
+#####################################################
+
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.sql
+*.dump
+
+#####################################################
+# 🛠 Configs & Local Env Files
+#####################################################
+
+*.env
+.env.*
+secrets.json
+*.config
+*.config.local
+*.config.user
+*.config.json
+appsettings.*.json
+
+#####################################################
+# 💻 OS-specific Garbage
+#####################################################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*.swp
+*.swo
+.nfs*
+
+#####################################################
+# 🔍 Others You Might Accidentally Create
+#####################################################
+
+*.tmp
+*.bak
+*.orig
+*.~*
+*.rej
+*.log
+*.tlog
+
+# npm/Yarn/PNPM stuff (for frontend)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Docker
+docker-compose.override.yml
+
+# Tools
+*.ncrunch*
+*.idea.*
