@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Persistence\" />
+      <Folder Include="Persistence\Core\" />
     </ItemGroup>
 
 </Project>
