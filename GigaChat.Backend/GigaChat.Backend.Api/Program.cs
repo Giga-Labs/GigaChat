@@ -1,9 +1,13 @@
 using GigaChat.Backend.Api;
+using GigaChat.Backend.Infrastructure;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDependencies(builder.Configuration);
+
+builder.Host.AddSerilog();
 
 var app = builder.Build();
 
@@ -18,6 +22,8 @@ if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Api
         options.RoutePrefix = "swagger";
     });
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
