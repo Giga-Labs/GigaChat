@@ -1,8 +1,13 @@
 using System.Text;
 using GigaChat.Backend.Application.Auth;
+using GigaChat.Backend.Application.Repositories.Identity;
+using GigaChat.Backend.Application.Services.Email;
 using GigaChat.Backend.Infrastructure.Auth;
 using GigaChat.Backend.Infrastructure.Persistence.Identity;
 using GigaChat.Backend.Infrastructure.Persistence.Identity.Entities;
+using GigaChat.Backend.Infrastructure.Repositories.Identity;
+using GigaChat.Backend.Infrastructure.Services.Email;
+using GigaChat.Backend.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +29,14 @@ public static class DependencyInjection
         services.AddIdentityServices();
 
         services.AddAuthenticationServices(config);
+
+        services.AddSettings();
+
+        services.AddEmailService();
+
+        services.AddOtpProvider();
+
+        services.AddOtpVerificationRepository();
         
         return services;
     }
@@ -62,10 +75,7 @@ public static class DependencyInjection
             .AddDefaultTokenProviders(); // Enables email confirmation, password reset, etc.
 
         // Register User Repository
-        // services.AddScoped<IUserRepository, UserRepository>();
-        
-        // Register Auth Repository
-        // services.AddScoped<IAuthRepository, AuthRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         
         return services;
     }
@@ -138,6 +148,42 @@ public static class DependencyInjection
         });
 
         return hostBuilder;
+    }
+    
+    private static IServiceCollection AddSettings(this IServiceCollection services)
+    {
+        services.AddOptions<AppSettings>()
+            .BindConfiguration(AppSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        services.AddOptions<MailSettings>()
+            .BindConfiguration(MailSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        return services;
+    }
+    
+    private static IServiceCollection AddEmailService(this IServiceCollection services)
+    {
+        services.AddScoped<IEmailService, EmailService>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddOtpProvider(this IServiceCollection services)
+    {
+        services.AddScoped<IOtpProvider, OtpProvider>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddOtpVerificationRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IOtpVerificationRepository, OtpVerificationRepository>();
+
+        return services;
     }
 
 }

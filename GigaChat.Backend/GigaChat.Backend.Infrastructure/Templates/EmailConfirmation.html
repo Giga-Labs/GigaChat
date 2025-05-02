@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>Verify your email</title>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #171717 !important;
+                color: #FFFFFF !important;
+            }
+            .container {
+                background-color: #222222 !important;
+            }
+            .heading {
+                color: #A8F0C0 !important;
+            }
+            .light-text {
+                color: #A0A0A0 !important;
+            }
+            .muted-text {
+                color: #888888 !important;
+            }
+            .footer-text {
+                color: #666666 !important;
+            }
+            .border {
+                border-top: 1px solid #333333 !important;
+            }
+            .button {
+                background-color: #A8F0C0 !important;
+                color: #0B320C !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; background-color: #FFFFFF; color: #000000;">
+<table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+        <td style="padding: 60px 0; text-align: center;">
+            <table class="container" role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; border-radius: 16px; background-color: #FFFFFF;">
+                <!-- Logo -->
+                <tr>
+                    <td style="text-align: center; padding: 40px 20px 30px;">
+                        <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-no-background-LQaQ6VIBnHevmJD6M4XQS9IdhZryIL.png" alt="GigaChat Logo" style="width: 220px; height: auto;">
+                    </td>
+                </tr>
+                <!-- Welcome Message -->
+                <tr>
+                    <td style="padding: 0 40px;">
+                        <h1 class="heading" style="font-size: 32px; font-weight: 500; margin: 0 0 20px; text-align: center; letter-spacing: -0.5px; color: #A8F0C0;">
+                            Welcome to GigaChat
+                        </h1>
+                        <p class="light-text" style="font-size: 18px; line-height: 1.6; margin: 0 0 30px; max-width: 400px; margin-left: auto; margin-right: auto; color: #505050;">
+                            Access granted... almost.<br>
+                            Verify your email to activate your private space.
+                        </p>
+                    </td>
+                </tr>
+                <!-- Verification Button -->
+                <tr>
+                    <td style="padding: 0 40px 32px;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+                            <tr>
+                                <td class="button" style="border-radius: 10px; text-align: center; background-color: #A8F0C0;">
+                                    <a href="{{link}}"
+                                       style="display: inline-block; font-size: 18px; font-weight: 500; padding: 16px 32px;
+                                       color: #0B320C; text-decoration: none; border-radius: 10px;">
+                                        Verify Email Address
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- Expiration Notice -->
+                <tr>
+                    <td style="padding: 0 40px 40px;">
+                        <p class="muted-text" style="font-size: 14px; line-height: 1.5; margin: 0; text-align: center; color: #707070;">
+                            This verification link will expire in 24 hours.
+                        </p>
+                    </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                    <td class="border" style="padding: 20px 40px; border-top: 1px solid #E0E0E0;">
+                        <p class="muted-text" style="font-size: 14px; line-height: 1.5; margin: 0 0 10px; color: #707070;">
+                            If you didn't create an account with GigaChat, you can safely ignore this email.
+                        </p>
+                        <p class="footer-text" style="font-size: 12px; line-height: 1.5; margin: 0; color: #909090;">
+                            This is an automated message. Please do not reply to this email.<br>
+                            © 2025 GigaChat. All rights reserved.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

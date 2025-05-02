@@ -15,6 +15,7 @@ public static class ErrorMappings
         "User.InvalidEmailConfirmationCode" => StatusCodes.Status403Forbidden,
         "User.EmailAlreadyConfirmed" => StatusCodes.Status400BadRequest,
         "Token.Invalid" => StatusCodes.Status401Unauthorized,
+        "User.ResetPasswordFailed" => StatusCodes.Status400BadRequest,
         _ => StatusCodes.Status400BadRequest // Default case
     };
 }
