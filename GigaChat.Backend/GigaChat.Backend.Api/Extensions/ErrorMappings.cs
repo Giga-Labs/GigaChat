@@ -17,6 +17,7 @@ public static class ErrorMappings
         "Token.Invalid" => StatusCodes.Status401Unauthorized,
         "User.ResetPasswordFailed" => StatusCodes.Status400BadRequest,
         "User.InvalidPasswordResetOtp" => StatusCodes.Status401Unauthorized,
+        "User.InvalidPasswordResetToken" => StatusCodes.Status401Unauthorized,
         _ => StatusCodes.Status400BadRequest // Default case
     };
 }

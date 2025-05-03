@@ -62,5 +62,12 @@ namespace GigaChat.Backend.Api.Controllers
             var result = await mediator.Send(new VerifyPasswordResetOtpCommand(request.Email, request.OtpCode), cancellationToken);
             return result.Succeeded ? Ok(result.Value) : result.ToProblem(result.Error.ToStatusCode());
         }
+
+        [HttpPost("password-reset")]
+        public async Task<IActionResult> PasswordResetAsync([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken = default)
+        {
+            var result = await mediator.Send(new ResetPasswordCommand(request.Token, request.NewPassword), cancellationToken);
+            return result.Succeeded ? Ok() : result.ToProblem(result.Error.ToStatusCode());
+        }
     }
 }

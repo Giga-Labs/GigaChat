@@ -127,6 +127,7 @@ public class UserRepository(UserManager<ApplicationUser> userManager) : IUserRep
             var result = await userManager.ResetPasswordAsync(applicationUser, token, newPassword);
             
             applicationUser.UpdatedAt = DateTime.UtcNow;
+            applicationUser.PasswordChangedAt = DateTime.UtcNow;
             await userManager.UpdateAsync(applicationUser);
 
             return result.Succeeded;

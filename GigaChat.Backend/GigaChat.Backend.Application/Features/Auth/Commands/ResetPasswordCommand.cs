@@ -3,8 +3,8 @@ using MediatR;
 
 namespace GigaChat.Backend.Application.Features.Auth.Commands;
 
-public record VerifyPasswordResetOtpCommand
+public record ResetPasswordCommand
 (
-    string Email, 
-    string OtpCode
-) : IRequest<Result<string>>;
+    string Token,
+    string NewPassword
+) : IRequest<Result>;
