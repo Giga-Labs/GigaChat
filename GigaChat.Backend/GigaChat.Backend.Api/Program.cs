@@ -1,5 +1,8 @@
 using GigaChat.Backend.Api;
 using GigaChat.Backend.Infrastructure;
+using GigaChat.Backend.Infrastructure.Persistence.Identity;
+using GigaChat.Backend.Infrastructure.Seeding;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 
@@ -10,6 +13,15 @@ builder.Services.AddDependencies(builder.Configuration);
 builder.Host.AddSerilog();
 
 var app = builder.Build();
+
+// seed the database(s)
+using (var scope = app.Services.CreateScope())
+{
+    // seed identity
+    var identityDbContext = scope.ServiceProvider.GetRequiredService<ApplicationUserDbContext>();
+    identityDbContext.Database.Migrate();
+    await IdentitySeeder.SeedAdminUserAsync(scope.ServiceProvider);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("ApiDocumentation:Enabled")) 

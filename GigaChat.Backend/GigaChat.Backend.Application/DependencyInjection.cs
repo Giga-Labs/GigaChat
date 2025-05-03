@@ -62,11 +62,6 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
         
-        services.AddOptions<OtpRateSettings>()
-            .BindConfiguration(OtpRateSettings.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-        
         return services;
     }
     

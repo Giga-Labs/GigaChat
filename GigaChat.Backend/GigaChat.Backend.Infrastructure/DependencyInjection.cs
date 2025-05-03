@@ -2,11 +2,13 @@ using System.Text;
 using GigaChat.Backend.Application.Auth;
 using GigaChat.Backend.Application.Repositories.Identity;
 using GigaChat.Backend.Application.Services.Email;
+using GigaChat.Backend.Application.Services.Otp;
 using GigaChat.Backend.Infrastructure.Auth;
 using GigaChat.Backend.Infrastructure.Persistence.Identity;
 using GigaChat.Backend.Infrastructure.Persistence.Identity.Entities;
 using GigaChat.Backend.Infrastructure.Repositories.Identity;
 using GigaChat.Backend.Infrastructure.Services.Email;
+using GigaChat.Backend.Infrastructure.Services.Otp;
 using GigaChat.Backend.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -34,9 +36,9 @@ public static class DependencyInjection
 
         services.AddEmailService();
 
-        services.AddOtpProvider();
-
         services.AddOtpVerificationRepository();
+
+        services.AddOtpServices();
         
         return services;
     }
@@ -162,6 +164,17 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
         
+        services.AddOptions<AdminSettings>()
+            .BindConfiguration(AdminSettings.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        services.AddOptions<OtpSettings>()
+            .BindConfiguration(OtpSettings.SectionName)
+            .ValidateDataAnnotations()
+            .Validate(otp => otp.Verification.MaxAttempts > 0 && otp.PasswordReset.MaxAttempts > 0 && otp.TwoFactor.MaxAttempts > 0, "OTP configuration must be valid.")
+            .ValidateOnStart();
+        
         return services;
     }
     
@@ -171,17 +184,19 @@ public static class DependencyInjection
 
         return services;
     }
-    
-    private static IServiceCollection AddOtpProvider(this IServiceCollection services)
+
+    private static IServiceCollection AddOtpVerificationRepository(this IServiceCollection services)
     {
-        services.AddScoped<IOtpProvider, OtpProvider>();
+        services.AddScoped<IOtpVerificationRepository, OtpVerificationRepository>();
 
         return services;
     }
     
-    private static IServiceCollection AddOtpVerificationRepository(this IServiceCollection services)
+    private static IServiceCollection AddOtpServices(this IServiceCollection services)
     {
-        services.AddScoped<IOtpVerificationRepository, OtpVerificationRepository>();
+        services.AddScoped<IOtpHashingService, OtpHashingService>();
+        
+        services.AddScoped<IOtpGenerator, OtpGenerator>();
 
         return services;
     }

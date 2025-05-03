@@ -1,10 +1,15 @@
+using GigaChat.Backend.Domain.Entities.Identity;
+using GigaChat.Backend.Domain.Enums.Identity;
+
 namespace GigaChat.Backend.Application.Auth;
 
 public interface IOtpProvider
 {
-    string GenerateOtp();
-    Task StoreOtpAsync(string email, string otp, CancellationToken cancellationToken);
-    Task<bool> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken);
-    Task<bool> ExceededLimit(string email, CancellationToken cancellationToken);
-    Task EndVarification(string email, string otp, CancellationToken cancellationToken);
+    Task<string> GenerateAsync(string userId, OtpPurpose purpose, CancellationToken cancellationToken = default);
+
+    Task RevokeAllButLatestAsync(string userId, OtpPurpose purpose, CancellationToken cancellationToken = default);
+
+    Task<bool> VerifyAsync(string userId, string otpCode, OtpPurpose purpose, CancellationToken cancellationToken = default);
+
+    Task MarkAsUsedAsync(Guid otpId, CancellationToken cancellationToken = default);
 }

@@ -49,25 +49,5 @@ namespace GigaChat.Backend.Api.Controllers
             return result.Succeeded ? Ok() : result.ToProblem(result.Error.ToStatusCode());
         }
         
-        [HttpPost("forget-password")]
-        public async Task<IActionResult> ForgetPassword([FromBody] ForgetPasswordRequest request)
-        {
-            var result = await mediator.Send(new SendResetPasswordCodeCommand(request.Email));
-            return result.Succeeded ? Ok() : result.ToProblem(result.Error.ToStatusCode());
-        }
-        
-        [HttpPost("verify-otp")]
-        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest request)
-        {
-            var result = await mediator.Send(new VerifyOtpCommand(request.Otp,request.Email));
-            return result.Succeeded ? Ok() : result.ToProblem(result.Error.ToStatusCode());
-        }
-        
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
-        {
-            var result = await mediator.Send(new ResetPasswordCommand(request.Email,request.Otp,request.NewPassword));
-            return result.Succeeded ? Ok() : result.ToProblem(result.Error.ToStatusCode());
-        }
     }
 }

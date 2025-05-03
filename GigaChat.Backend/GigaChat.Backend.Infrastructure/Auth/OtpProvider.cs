@@ -1,69 +1,108 @@
 using GigaChat.Backend.Application.Auth;
 using GigaChat.Backend.Application.Repositories.Identity;
-using GigaChat.Backend.Application.Settings;
+using GigaChat.Backend.Application.Services.Otp;
 using GigaChat.Backend.Domain.Entities.Identity;
-using Microsoft.Extensions.Logging;
+using GigaChat.Backend.Domain.Enums.Identity;
+using GigaChat.Backend.Infrastructure.Settings;
 using Microsoft.Extensions.Options;
 
 namespace GigaChat.Backend.Infrastructure.Auth;
 
-public class OtpProvider(IOtpVerificationRepository otpRepository, IOptions<OtpRateSettings> otpRateSettings , ILogger<OtpProvider> logger) : IOtpProvider
+public class OtpProvider(IOtpVerificationRepository otpVerificationRepository, IOtpHashingService otpHashingService, IOtpGenerator otpGenerator, IOptions<OtpSettings> otpOptions) : IOtpProvider
 {
-    public string GenerateOtp()
+    
+    public async Task<string> GenerateAsync(string userId, OtpPurpose purpose, CancellationToken cancellationToken = default)
     {
-        // Generate a 6-digit OTP
-        var random = new Random();
-        return random.Next(100000, 999999).ToString();
-    }
-
-    public async Task StoreOtpAsync(string email, string otp, CancellationToken cancellationToken)
-    {
-        var otpVerification = new OtpVerification
+        var config = purpose switch
         {
-            Id = Guid.NewGuid(),
-            Email = email,
-            OtpCode = otp,
-            CreatedOn = DateTime.UtcNow,
-            ExpiresOn = DateTime.UtcNow.AddMinutes(10), // OTP valid for 10 minutes
-            IsUsed = false
+            OtpPurpose.PasswordReset => otpOptions.Value.PasswordReset,
+            OtpPurpose.EmailVerification => otpOptions.Value.Verification,
+            OtpPurpose.TwoFactorAuth => otpOptions.Value.TwoFactor,
+            _ => throw new InvalidOperationException("Unhandled OTP purpose")
         };
 
-        await otpRepository.AddAsync(otpVerification, cancellationToken);
-    }
+        // check rate limit
+        var recentCount = await otpVerificationRepository.CountRecentOtpsAsync(userId, purpose, TimeSpan.FromMinutes(config.WindowMinutes), cancellationToken);
 
-    public async Task<bool> VerifyOtpAsync(string email, string otp, CancellationToken cancellationToken)
-    {
-        var otpVerification = await otpRepository.FindByEmailAndOtpAsync(email, otp, cancellationToken);
-        if (otpVerification == null || otpVerification.IsUsed || otpVerification.ExpiresOn < DateTime.UtcNow)
-            return false;
+        if (recentCount >= config.MaxAttempts)
+            throw new InvalidOperationException("Too many OTP requests. Please wait before trying again.");
 
-        
-        return true;
-    }
+        // revoke old OTPs
+        await RevokeAllButLatestAsync(userId, purpose, cancellationToken);
 
-    public async Task<bool> ExceededLimit(string email, CancellationToken cancellationToken)
-    {
-        var RateLimitWindow = TimeSpan.FromHours(otpRateSettings.Value.RateLimitWindowByHours);
-        var recentOtps = await otpRepository.GetRecentOtpsAsync(email, RateLimitWindow,cancellationToken);
+        var rawOtp = otpGenerator.GenerateCode();
+        var hashedOtp = otpHashingService.Hash(rawOtp);
 
-        var MaxAttempts = otpRateSettings.Value.MaxAttempts;
-
-
-        if (recentOtps.Count() >= MaxAttempts)
+        var otp = new OtpVerification
         {
-            logger.LogWarning("Rate limit exceeded for email: {Email}. Max attempts: {MaxAttempts} within {Window}",
-                email, MaxAttempts, RateLimitWindow);
-            return true;
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Purpose = purpose,
+            HashedOtpCode = hashedOtp,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(config.ExpiryMinutes)
+        };
+
+        await otpVerificationRepository.AddAsync(otp, cancellationToken);
+
+        return rawOtp;
+    }
+
+    public async Task RevokeAllButLatestAsync(string userId, OtpPurpose purpose, CancellationToken cancellationToken = default)
+    {
+        var activeOtps = await otpVerificationRepository
+            .GetAllActiveOtpsForUserAsync(userId, purpose, cancellationToken);
+
+        if (!activeOtps.Any())
+            return;
+
+        var latest = activeOtps
+            .OrderByDescending(x => x.CreatedAt)
+            .First();
+
+        var toRevoke = activeOtps
+            .Where(x => x.Id != latest.Id)
+            .ToList();
+
+        if (!toRevoke.Any())
+            return;
+
+        foreach (var otp in toRevoke)
+        {
+            otp.RevokedAt = DateTime.UtcNow;
+            otp.UpdatedAt = DateTime.UtcNow;
         }
 
-        return false;
+        await otpVerificationRepository.UpdateRangeAsync(toRevoke, cancellationToken);
     }
-    public async Task EndVarification(string email, string otp, CancellationToken cancellationToken)
+
+    public async Task<bool> VerifyAsync(string userId, string otpCode, OtpPurpose purpose, CancellationToken cancellationToken = default)
     {
-        var otpVerification = await otpRepository.FindByEmailAndOtpAsync(email, otp, cancellationToken);
-       
-        otpVerification!.IsUsed = true;
-        await otpRepository.UpdateAsync(otpVerification, cancellationToken);
-        
+        var otp = await otpVerificationRepository
+            .GetLatestActiveOtpAsync(userId, purpose, cancellationToken);
+
+        if (otp is null)
+            return false;
+
+        if (otp.ExpiresAt < DateTime.UtcNow)
+            return false;
+
+        if (otp.IsUsed || otp.RevokedAt != null)
+            return false;
+
+        return otpHashingService.Verify(otpCode, otp.HashedOtpCode);
+    }
+
+    public async Task MarkAsUsedAsync(Guid otpId, CancellationToken cancellationToken = default)
+    {
+        var otp = await otpVerificationRepository.GetByIdAsync(otpId, cancellationToken);
+    
+        if (otp is null || otp.IsUsed || otp.DeletedAt != null)
+            return;
+
+        otp.IsUsed = true;
+        otp.UpdatedAt = DateTime.UtcNow;
+
+        await otpVerificationRepository.UpdateAsync(otp, cancellationToken);
     }
 }

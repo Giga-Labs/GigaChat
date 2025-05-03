@@ -15,5 +15,13 @@ public class ApplicationUserConfigurations : IEntityTypeConfiguration<Applicatio
             .ToTable("RefreshTokens")
             .WithOwner()
             .HasForeignKey("UserId");
+        
+        builder.HasIndex(u => u.Email)
+            .HasFilter("[DeletedAt] IS NULL");
+        
+        builder.HasIndex(u => u.UserName)
+            .HasFilter("[DeletedAt] IS NULL");
+        
+        builder.HasIndex(u => u.DeletedAt);
     }
 }
