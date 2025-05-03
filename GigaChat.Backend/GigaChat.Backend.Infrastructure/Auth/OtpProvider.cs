@@ -75,8 +75,8 @@ public class OtpProvider(IOtpVerificationRepository otpVerificationRepository, I
 
         await otpVerificationRepository.UpdateRangeAsync(toRevoke, cancellationToken);
     }
-
-    public async Task<bool> VerifyAsync(string userId, string otpCode, OtpPurpose purpose, CancellationToken cancellationToken = default)
+    
+    public async Task<bool> IsValidOtpAsync(string userId, string otpCode, OtpPurpose purpose, CancellationToken cancellationToken = default)
     {
         var otp = await otpVerificationRepository
             .GetLatestActiveOtpAsync(userId, purpose, cancellationToken);
@@ -90,7 +90,30 @@ public class OtpProvider(IOtpVerificationRepository otpVerificationRepository, I
         if (otp.IsUsed || otp.RevokedAt != null)
             return false;
 
-        return otpHashingService.Verify(otpCode, otp.HashedOtpCode);
+        return otpHashingService.Verify(otpCode, otp.HashedOtpCode);;
+    }
+
+    public async Task<bool> VerifyAndConsumeAsync(string userId, string otpCode, OtpPurpose purpose, CancellationToken cancellationToken = default)
+    {
+        var otp = await otpVerificationRepository
+            .GetLatestActiveOtpAsync(userId, purpose, cancellationToken);
+
+        if (otp is null)
+            return false;
+
+        if (otp.ExpiresAt < DateTime.UtcNow)
+            return false;
+
+        if (otp.IsUsed || otp.RevokedAt != null)
+            return false;
+        
+        var result = otpHashingService.Verify(otpCode, otp.HashedOtpCode);
+        if (!result)
+            return false;
+
+        await MarkAsUsedAsync(otp.Id, cancellationToken);
+
+        return true;
     }
 
     public async Task MarkAsUsedAsync(Guid otpId, CancellationToken cancellationToken = default)

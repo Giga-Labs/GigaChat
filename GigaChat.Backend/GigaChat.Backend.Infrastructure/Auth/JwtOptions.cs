@@ -9,9 +9,13 @@ public class JwtOptions
 
     [Required] public string Key { get; set; } = string.Empty;
     [Required] public string ConfirmationEmailKey { get; set; } = string.Empty;
+    [Required] public string OtpKey { get; set; } = string.Empty;
+    [Required] public string PasswordResetKey { get; set; } = string.Empty;
     [Required] public string Issuer { get; set; } = string.Empty;
     [Required] public string Audience { get; set; } = string.Empty;
     [Range(1, int.MaxValue)] public int ExpiryMinutes { get; set; }
-    [Range(1, int.MaxValue)] public int ConfirmationEmailExpiryMinutes { get; set; }
+    [Range(1, int.MaxValue)] public int ConfirmationEmailTokenExpiryMinutes { get; set; }
+    [Range(1, int.MaxValue)] public int OtpTokenExpiryMinutes { get; set; }
+    [Range(1, int.MaxValue)] public int PasswordResetTokenExpiryMinutes { get; set; }
 
 }

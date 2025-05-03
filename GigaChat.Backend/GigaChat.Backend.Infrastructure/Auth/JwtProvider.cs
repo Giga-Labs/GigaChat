@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using GigaChat.Backend.Application.Auth;
+using GigaChat.Backend.Domain.Enums.Identity;
 using GigaChat.Backend.Domain.Interfaces.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -84,7 +85,7 @@ public class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
             issuer: jwtOptions.Value.Issuer,
             audience: jwtOptions.Value.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(jwtOptions.Value.ConfirmationEmailExpiryMinutes),
+            expires: DateTime.UtcNow.AddMinutes(jwtOptions.Value.ConfirmationEmailTokenExpiryMinutes),
             signingCredentials: signingCredentials
         );
 
@@ -112,6 +113,116 @@ public class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
             var email = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
             var confirmationCode = jwtToken.Claims.FirstOrDefault(c => c.Type == "confirmationCode")?.Value;
             return (userId, confirmationCode, email);
+        }
+        catch
+        {
+            return (null, null, null);
+        }
+    }
+    
+    public string GenerateOtpJwtToken(string userId, string email, OtpPurpose purpose)
+    {
+        if (purpose == OtpPurpose.PasswordReset)
+            throw new InvalidOperationException("Use GeneratePasswordResetJwt instead for password reset flows.");
+        
+        Claim[] claims =
+        [
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Email, email),
+            new("otpPurpose", purpose.ToString()),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        ];
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.OtpKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: jwtOptions.Value.Issuer,
+            audience: jwtOptions.Value.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(jwtOptions.Value.OtpTokenExpiryMinutes),
+            signingCredentials: creds);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    public (string? userId, string? email, OtpPurpose? purpose) ValidateOtpJwtToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.OtpKey));
+
+        try
+        {
+            handler.ValidateToken(token, new TokenValidationParameters
+            {
+                IssuerSigningKey = key,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out var validatedToken);
+
+            var jwt = (JwtSecurityToken)validatedToken;
+
+            var userId = jwt.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            var email = jwt.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
+            var purposeStr = jwt.Claims.FirstOrDefault(c => c.Type == "otpPurpose")?.Value;
+
+            var success = Enum.TryParse<OtpPurpose>(purposeStr, out var purpose);
+            return success ? (userId, email, purpose) : (null, null, null);
+        }
+        catch
+        {
+            return (null, null, null);
+        }
+    }
+    
+    public string GeneratePasswordResetJwt(string userId, string email, string identityToken)
+    {
+        Claim[] claims =
+        [
+            new(JwtRegisteredClaimNames.Sub, userId),
+            new(JwtRegisteredClaimNames.Email, email),
+            new("resetToken", identityToken),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        ];
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.PasswordResetKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: jwtOptions.Value.Issuer,
+            audience: jwtOptions.Value.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(jwtOptions.Value.PasswordResetTokenExpiryMinutes),
+            signingCredentials: creds);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
+    public (string? userId, string? email, string? identityToken) ValidatePasswordResetJwt(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.PasswordResetKey));
+
+        try
+        {
+            handler.ValidateToken(token, new TokenValidationParameters
+            {
+                IssuerSigningKey = key,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out var validatedToken);
+
+            var jwt = (JwtSecurityToken)validatedToken;
+
+            var userId = jwt.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            var email = jwt.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value;
+            var resetToken = jwt.Claims.FirstOrDefault(c => c.Type == "resetToken")?.Value;
+
+            return (userId, email, resetToken);
         }
         catch
         {

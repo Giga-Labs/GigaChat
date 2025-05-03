@@ -13,6 +13,6 @@ public static class UserErrors
     public static readonly Error InvalidEmailConfirmationToken = new("User.InvalidEmailConfirmationToken", "Invalid email confirmation token."); // the token as a whole though like the Jwt
     public static readonly Error EmailAlreadyConfirmed = new("User.EmailAlreadyConfirmed", "The email is already confirmed.");
     public static readonly Error EmailConfirmationFailed = new("User.EmailConfirmationFailed", "Email confirmation failed.");
-    public static readonly Error ResetPasswordFailed =
-        new("User.ResetPasswordFailed", "Reset password failed.");
+    public static readonly Error ResetPasswordFailed = new("User.ResetPasswordFailed", "Reset password failed.");
+    public static readonly Error InvalidPasswordResetOtp = new("User.InvalidPasswordResetOtp", "Invalid or expired OTP.");
 }

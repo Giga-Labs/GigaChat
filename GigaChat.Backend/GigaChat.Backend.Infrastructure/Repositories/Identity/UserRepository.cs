@@ -124,9 +124,8 @@ public class UserRepository(UserManager<ApplicationUser> userManager) : IUserRep
     {
         if (user is ApplicationUser applicationUser)
         {
-            var result = await userManager.ChangePasswordAsync(applicationUser, token, newPassword);
-
-
+            var result = await userManager.ResetPasswordAsync(applicationUser, token, newPassword);
+            
             applicationUser.UpdatedAt = DateTime.UtcNow;
             await userManager.UpdateAsync(applicationUser);
 
