@@ -22,9 +22,9 @@ public class ConfirmEmailCommandHandler(IUserRepository userRepository,IJwtProvi
             return Result.Failure(UserErrors.InvalidEmailConfirmationToken);
         
         var user = userById;
-      
+
         if (user.EmailConfirmed)
-            return Result.Failure(UserErrors.EmailAlreadyConfirmed);
+            return Result.Success(); // lie
 
         var confirmationResult = await userRepository.ConfirmEmailAsync(user, confirmationCode);
         if (!confirmationResult)

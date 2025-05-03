@@ -198,6 +198,8 @@ public static class DependencyInjection
         
         services.AddScoped<IOtpGenerator, OtpGenerator>();
 
+        services.AddScoped<IOtpProvider, OtpProvider>();
+
         return services;
     }
 

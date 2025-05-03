@@ -17,7 +17,7 @@ public class ResendConfirmationEmailCommandHandler(IUserRepository userRepositor
             return Result.Success();
 
         if (user.EmailConfirmed)
-            return Result.Failure(UserErrors.EmailAlreadyConfirmed);
+            return Result.Success(); // lie
 
         var confirmationCode = await userRepository.GenerateEmailConfirmationTokenAsync(user);
         

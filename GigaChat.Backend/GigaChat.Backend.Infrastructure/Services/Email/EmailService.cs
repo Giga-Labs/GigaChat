@@ -61,7 +61,7 @@ public class EmailService(IOptions<MailSettings> mailSettings,IOptions<AppSettin
             {"{{otp_code}}", otp},
         });
 
-        await SendEmailAsync(email, "GigaChat: Reset Password", emailBody);
+        await SendEmailAsync(email, $"{otp} - GigaChat: Reset Password", emailBody);
     }
     
 }
