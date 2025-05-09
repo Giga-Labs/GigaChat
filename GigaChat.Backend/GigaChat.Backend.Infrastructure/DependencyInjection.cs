@@ -1,11 +1,14 @@
 using System.Text;
 using GigaChat.Backend.Application.Auth;
+using GigaChat.Backend.Application.Repositories.Core;
 using GigaChat.Backend.Application.Repositories.Identity;
 using GigaChat.Backend.Application.Services.Email;
 using GigaChat.Backend.Application.Services.Otp;
 using GigaChat.Backend.Infrastructure.Auth;
+using GigaChat.Backend.Infrastructure.Persistence.Core;
 using GigaChat.Backend.Infrastructure.Persistence.Identity;
 using GigaChat.Backend.Infrastructure.Persistence.Identity.Entities;
+using GigaChat.Backend.Infrastructure.Repositories.Core;
 using GigaChat.Backend.Infrastructure.Repositories.Identity;
 using GigaChat.Backend.Infrastructure.Services.Email;
 using GigaChat.Backend.Infrastructure.Services.Otp;
@@ -28,6 +31,8 @@ public static class DependencyInjection
     {
         services.AddApplicationUserDbContext(config);
 
+        services.AddCoreDbContext(config);
+
         services.AddIdentityServices();
 
         services.AddAuthenticationServices(config);
@@ -39,6 +44,36 @@ public static class DependencyInjection
         services.AddOtpVerificationRepository();
 
         services.AddOtpServices();
+
+        services.AddConversationRepository();
+
+        services.AddMessageRepository();
+
+        services.AddBlockedUserRepository();
+
+        services.AddClearedConversationRepository();
+
+        services.AddConversationInviteLogRepository();
+
+        services.AddConversationMemberRepository();
+
+        services.AddDeletedMessageRepository();
+
+        services.AddFileUploadMetadataRepository();
+
+        services.AddMessageEditHistoryRepository();
+
+        services.AddMessageReactionRepository();
+
+        services.AddMessageReceiptRepository();
+
+        services.AddPinnedMessageRepository();
+
+        services.AddReportedInviteRepository();
+
+        services.AddUserSettingsRepository();
+
+        services.AddUserSpamScoreRepository();
         
         return services;
     }
@@ -51,6 +86,16 @@ public static class DependencyInjection
                                              "Can't find IdentityDb connection string.");
         services.AddDbContext<ApplicationUserDbContext>(options => options.UseSqlServer(identityDbConnectionString));
 
+        return services;
+    }
+    
+    private static IServiceCollection AddCoreDbContext(this IServiceCollection services, IConfiguration config)
+    {
+        var coreDbConnectionString = config.GetConnectionString("CoreDbConnectionString") ??
+                                     throw new InvalidOperationException("Can't find CoreDb connection string.");
+
+        services.AddDbContext<CoreDbContext>(options => options.UseSqlServer(coreDbConnectionString));
+        
         return services;
     }
     
@@ -191,11 +236,11 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
     private static IServiceCollection AddOtpServices(this IServiceCollection services)
     {
         services.AddScoped<IOtpHashingService, OtpHashingService>();
-        
+
         services.AddScoped<IOtpGenerator, OtpGenerator>();
 
         services.AddScoped<IOtpProvider, OtpProvider>();
@@ -203,4 +248,109 @@ public static class DependencyInjection
         return services;
     }
 
+    private static IServiceCollection AddConversationRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IConversationRepository, ConversationRepository>();
+
+        return services;
+    }
+    
+    
+    private static IServiceCollection AddMessageRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IMessageRepository, MessageRepository>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddBlockedUserRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IBlockedUserRepository, BlockedUserRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddClearedConversationRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IClearedConversationRepository, ClearedConversationRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddConversationInviteLogRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IConversationInviteLogRepository, ConversationInviteLogRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddConversationMemberRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IConversationMemberRepository, ConversationMemberRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddDeletedMessageRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IDeletedMessageRepository, DeletedMessageRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddFileUploadMetadataRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IFileUploadMetadataRepository, FileUploadMetadataRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddMessageEditHistoryRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IMessageEditHistoryRepository, MessageEditHistoryRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddMessageReactionRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IMessageReactionRepository, MessageReactionRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddMessageReceiptRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IMessageReceiptRepository, MessageReceiptRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddPinnedMessageRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IPinnedMessageRepository, PinnedMessageRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddReportedInviteRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IReportedInviteRepository, ReportedInviteRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddUserSettingsRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IUserSettingsRepository, UserSettingsRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddUserSpamScoreRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IUserSpamScoreRepository, UserSpamScoreRepository>();
+
+        return services;
+    }
 }

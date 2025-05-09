@@ -23,12 +23,15 @@ public static class DependencyInjection
     private static IServiceCollection AddCors(this IServiceCollection services)
     {
         services.AddCors(options =>
-            options.AddPolicy("AllowAny", builder =>
-                builder.AllowAnyMethod()
+        {
+            options.AddPolicy("AllowSpecificOrigin", builder =>
+            {
+                builder.WithOrigins("http://localhost:5173", "https://gigachat.vercel.app", "https://gigachat.tech") 
                     .AllowAnyHeader()
-                    .AllowAnyOrigin()
-            )
-        );
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
 
         return services;
     }

@@ -4,9 +4,7 @@ public class AuditableEntity
 {
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
-    public DateTime? DeletedAt { get; set; }
 
     public string CreatedById { get; set; } = default!;
     public string? UpdatedById { get; set; }
-    public string? DeletedById { get; set; }
 }

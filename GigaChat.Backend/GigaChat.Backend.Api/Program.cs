@@ -39,9 +39,13 @@ app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAny");
+app.UseCors("AllowSpecificOrigin");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
+
+// app.MapHub<ConversationHub>("/hubs/conversation").RequireCors("AllowSpecificOrigin");
 
 app.MapControllers();
 
