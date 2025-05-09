@@ -33,9 +33,30 @@ public class ConversationInviteLogRepository(CoreDbContext coreDbContext) : ICon
         await coreDbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AddRangeAsync(IEnumerable<ConversationInviteLog> logs, CancellationToken cancellationToken = default)
+    {
+        await coreDbContext.ConversationInviteLogs.AddRangeAsync(logs, cancellationToken);
+        await coreDbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task UpdateAsync(ConversationInviteLog inviteLog, CancellationToken cancellationToken = default)
     {
         coreDbContext.Update(inviteLog);
         await coreDbContext.SaveChangesAsync(cancellationToken);
+    }
+    
+    public async Task RemoveAsync(ConversationInviteLog inviteLog, CancellationToken cancellationToken = default)
+    {
+        coreDbContext.Remove(inviteLog);
+        await coreDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<ConversationInviteLog?> GetByUserAndConversationAsync(string userId, Guid conversationId, CancellationToken cancellationToken = default)
+    {
+        return await coreDbContext.ConversationInviteLogs
+            .FirstOrDefaultAsync(invite =>
+                    invite.ConversationId == conversationId &&
+                    invite.InviteeId == userId,
+                cancellationToken);
     }
 }

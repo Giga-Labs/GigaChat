@@ -46,6 +46,12 @@ public class ConversationMemberRepository(CoreDbContext coreDbContext) : IConver
         await coreDbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AddRangeAsync(IEnumerable<ConversationMember> members, CancellationToken cancellationToken = default)
+    {
+        await coreDbContext.ConversationMembers.AddRangeAsync(members, cancellationToken);
+        await coreDbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task UpdateAsync(ConversationMember member, CancellationToken cancellationToken = default)
     {
         coreDbContext.ConversationMembers.Update(member);

@@ -3,6 +3,7 @@ using GigaChat.Backend.Application.Auth;
 using GigaChat.Backend.Application.Repositories.Core;
 using GigaChat.Backend.Application.Repositories.Identity;
 using GigaChat.Backend.Application.Services.Email;
+using GigaChat.Backend.Application.Services.Hubs;
 using GigaChat.Backend.Application.Services.Otp;
 using GigaChat.Backend.Infrastructure.Auth;
 using GigaChat.Backend.Infrastructure.Persistence.Core;
@@ -11,6 +12,7 @@ using GigaChat.Backend.Infrastructure.Persistence.Identity.Entities;
 using GigaChat.Backend.Infrastructure.Repositories.Core;
 using GigaChat.Backend.Infrastructure.Repositories.Identity;
 using GigaChat.Backend.Infrastructure.Services.Email;
+using GigaChat.Backend.Infrastructure.Services.Hubs;
 using GigaChat.Backend.Infrastructure.Services.Otp;
 using GigaChat.Backend.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -74,6 +76,8 @@ public static class DependencyInjection
         services.AddUserSettingsRepository();
 
         services.AddUserSpamScoreRepository();
+
+        services.AddConversationConnectionTracker();
         
         return services;
     }
@@ -155,6 +159,25 @@ public static class DependencyInjection
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.Key!)),
                     ValidIssuer = jwtSettings?.Issuer,
                     ValidAudience = jwtSettings?.Audience,
+                };
+                
+                // for signalr
+                o.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && (
+                                path.StartsWithSegments("/hubs/messages") ||
+                                path.StartsWithSegments("/hubs/conversations")))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -350,6 +373,13 @@ public static class DependencyInjection
     private static IServiceCollection AddUserSpamScoreRepository(this IServiceCollection services)
     {
         services.AddScoped<IUserSpamScoreRepository, UserSpamScoreRepository>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddConversationConnectionTracker(this IServiceCollection services)
+    {
+        services.AddSingleton<IConversationConnectionTracker, ConversationConnectionTracker>();
 
         return services;
     }

@@ -1,4 +1,5 @@
 using GigaChat.Backend.Api;
+using GigaChat.Backend.Api.Hubs;
 using GigaChat.Backend.Infrastructure;
 using GigaChat.Backend.Infrastructure.Persistence.Identity;
 using GigaChat.Backend.Infrastructure.Seeding;
@@ -45,7 +46,9 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// app.MapHub<ConversationHub>("/hubs/conversation").RequireCors("AllowSpecificOrigin");
+app.MapHub<ConversationHub>("/hubs/conversations").RequireCors("AllowSpecificOrigin");
+
+app.MapHub<MessageHub>("/hubs/messages").RequireCors("AllowSpecificOrigin");
 
 app.MapControllers();
 

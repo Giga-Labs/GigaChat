@@ -10,6 +10,7 @@ public interface IConversationMemberRepository
     Task<IReadOnlyList<Guid>> GetConversationIdsForUserAsync(string userId, CancellationToken cancellationToken = default);
     Task<ConversationMember?> FindAsync(string userId, Guid conversationId, CancellationToken cancellationToken = default);
     Task AddAsync(ConversationMember member, CancellationToken cancellationToken = default);
+    Task AddRangeAsync(IEnumerable<ConversationMember> members, CancellationToken cancellationToken = default);
     Task UpdateAsync(ConversationMember member, CancellationToken cancellationToken = default);
     Task RemoveAsync(ConversationMember member, CancellationToken cancellationToken = default);
 }

@@ -1,4 +1,6 @@
+using GigaChat.Backend.Api.Services.Hubs;
 using GigaChat.Backend.Application;
+using GigaChat.Backend.Application.Services.Hubs;
 using GigaChat.Backend.Infrastructure;
 
 namespace GigaChat.Backend.Api;
@@ -16,6 +18,10 @@ public static class DependencyInjection
         services.AddApplicationLayerServices();
 
         services.AddCors();
+
+        services.AddHubServices();
+
+        services.AddSignalR();
         
         return services;
     }
@@ -32,6 +38,15 @@ public static class DependencyInjection
                     .AllowCredentials();
             });
         });
+
+        return services;
+    }
+    
+    private static IServiceCollection AddHubServices(this IServiceCollection services)
+    {
+        services.AddScoped<IConversationHubNotifier, ConversationHubNotifier>();
+
+        services.AddScoped<IMessageHubNotifier, MessageHubNotifier>();
 
         return services;
     }

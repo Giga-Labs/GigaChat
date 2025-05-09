@@ -18,6 +18,18 @@ public static class ErrorMappings
         "User.ResetPasswordFailed" => StatusCodes.Status400BadRequest,
         "User.InvalidPasswordResetOtp" => StatusCodes.Status401Unauthorized,
         "User.InvalidPasswordResetToken" => StatusCodes.Status401Unauthorized,
+        "Conversation.UnauthorizedAction" => StatusCodes.Status403Forbidden,
+        "Conversation.AccessDenied" => StatusCodes.Status403Forbidden,
+        "Conversation.AlreadyExists" => StatusCodes.Status409Conflict,
+        "Conversation.UserNotFound" => StatusCodes.Status404NotFound,
+        "Conversation.NoParticipants" => StatusCodes.Status400BadRequest,
+        "Conversation.SelfReference" => StatusCodes.Status400BadRequest,
+        "Conversation.InvalidIdentifier" => StatusCodes.Status400BadRequest,
+        "Conversation.BlockedByUser" => StatusCodes.Status403Forbidden,
+        "Conversation.Spammer" => StatusCodes.Status403Forbidden,
+        "Conversation.InviteRejected" => StatusCodes.Status400BadRequest,
+        "Conversation.NotGroupAdmin" => StatusCodes.Status403Forbidden,
+        "Conversation.InviteNotFound" => StatusCodes.Status404NotFound,
         _ => StatusCodes.Status400BadRequest // Default case
     };
 }

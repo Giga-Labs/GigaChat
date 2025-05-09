@@ -10,7 +10,10 @@ public interface IConversationInviteLogRepository
 
     Task<IReadOnlyList<ConversationInviteLog>> GetInvitesSentByUserAsync(string inviterId, CancellationToken cancellationToken = default);
 
-    Task AddAsync(ConversationInviteLog inviteLog, CancellationToken cancellationToken = default);   
+    Task AddAsync(ConversationInviteLog inviteLog, CancellationToken cancellationToken = default);
+    Task AddRangeAsync(IEnumerable<ConversationInviteLog> logs, CancellationToken cancellationToken = default);
 
     Task UpdateAsync(ConversationInviteLog inviteLog, CancellationToken cancellationToken = default);
+    Task RemoveAsync(ConversationInviteLog inviteLog, CancellationToken cancellationToken = default);
+    Task<ConversationInviteLog?> GetByUserAndConversationAsync(string userId, Guid conversationId, CancellationToken cancellationToken = default);
 }
