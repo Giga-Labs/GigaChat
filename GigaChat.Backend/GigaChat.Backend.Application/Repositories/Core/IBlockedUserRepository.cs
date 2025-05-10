@@ -9,4 +9,5 @@ public interface IBlockedUserRepository
     Task AddAsync(BlockedUser blockedUser, CancellationToken cancellationToken = default);
     Task UpdateAsync(BlockedUser blockedUser, CancellationToken cancellationToken = default);
     Task RemoveAsync(BlockedUser blockedUser, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<BlockedUser>> GetBlockedUsersAsync(string userId, CancellationToken cancellationToken = default);
 }

@@ -37,5 +37,11 @@ public class BlockedUserRepository(CoreDbContext coreDbContext) : IBlockedUserRe
         await coreDbContext.SaveChangesAsync(cancellationToken);
     }
 
-    
+    public async Task<IReadOnlyList<BlockedUser>> GetBlockedUsersAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        return await coreDbContext.BlockedUsers
+            .Where(b => b.UserId == userId)
+            .OrderByDescending(b => b.BlockedAt)
+            .ToListAsync(cancellationToken);
+    }
 }

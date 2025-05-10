@@ -33,6 +33,7 @@ public static class ErrorMappings
         "Conversation.CannotModifySelf" => StatusCodes.Status403Forbidden,
         "Conversation.TargetNotMember" => StatusCodes.Status400BadRequest,
         "Conversation.CannotRemoveFromPrivateChat" => StatusCodes.Status403Forbidden,
+        "Block.SelfBlock" => StatusCodes.Status403Forbidden,
         _ => StatusCodes.Status400BadRequest // Default case
     };
 }

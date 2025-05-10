@@ -78,6 +78,8 @@ public static class DependencyInjection
         services.AddUserSpamScoreRepository();
 
         services.AddConversationConnectionTracker();
+
+        services.AddUserConnectionTracker();
         
         return services;
     }
@@ -380,6 +382,13 @@ public static class DependencyInjection
     private static IServiceCollection AddConversationConnectionTracker(this IServiceCollection services)
     {
         services.AddSingleton<IConversationConnectionTracker, ConversationConnectionTracker>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddUserConnectionTracker(this IServiceCollection services)
+    {
+        services.AddSingleton<IUserConnectionTracker, UserConnectionTracker>();
 
         return services;
     }
