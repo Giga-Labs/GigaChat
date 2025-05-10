@@ -15,9 +15,18 @@ public class RemoveConversationCommandHandler(IConversationRepository conversati
         if (conversation is null)
             return Result.Failure(ConversationErrors.NotFound);
 
-        var isAdmin = await conversationMemberRepository.IsAdminAsync(request.RequesterId, request.ConversationId, cancellationToken);
-        if (!isAdmin)
-            return Result.Failure(ConversationErrors.AccessDenied);
+        if (conversation.IsGroup)
+        {
+            var isAdmin = await conversationMemberRepository.IsAdminAsync(request.RequesterId, request.ConversationId, cancellationToken);
+            if (!isAdmin)
+                return Result.Failure(ConversationErrors.AccessDenied);
+        }
+        else
+        {
+            var isMember = await conversationMemberRepository.IsMemberAsync(request.RequesterId, request.ConversationId, cancellationToken);
+            if (!isMember)
+                return Result.Failure(ConversationErrors.AccessDenied);
+        }
 
         var members = await conversationMemberRepository.GetMembersAsync(request.ConversationId, cancellationToken);
         var participantIds = members.Select(m => m.UserId).Distinct().ToList();

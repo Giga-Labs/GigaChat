@@ -110,5 +110,18 @@ namespace GigaChat.Backend.Api.Controllers
 
             return result.Succeeded ? NoContent() : result.ToProblem(result.Error.ToStatusCode());
         }
+
+        [HttpPost("{conversationId}/clear")]
+        public async Task<IActionResult> ClearConversationAsync([FromRoute] Guid conversationId, CancellationToken cancellationToken = default)
+        {
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
+                return Unauthorized();
+
+            var command = new ClearConversationCommand(conversationId, requesterId);
+            var result = await mediator.Send(command, cancellationToken);
+            
+            return result.Succeeded ? NoContent() : result.ToProblem(result.Error.ToStatusCode());
+        }
     }
 }
