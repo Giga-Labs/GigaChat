@@ -5,6 +5,7 @@ using GigaChat.Backend.Application.Repositories.Identity;
 using GigaChat.Backend.Application.Services.Email;
 using GigaChat.Backend.Application.Services.Hubs;
 using GigaChat.Backend.Application.Services.Otp;
+using GigaChat.Backend.Application.Services.Storage;
 using GigaChat.Backend.Infrastructure.Auth;
 using GigaChat.Backend.Infrastructure.Persistence.Core;
 using GigaChat.Backend.Infrastructure.Persistence.Identity;
@@ -14,6 +15,7 @@ using GigaChat.Backend.Infrastructure.Repositories.Identity;
 using GigaChat.Backend.Infrastructure.Services.Email;
 using GigaChat.Backend.Infrastructure.Services.Hubs;
 using GigaChat.Backend.Infrastructure.Services.Otp;
+using GigaChat.Backend.Infrastructure.Services.Storage;
 using GigaChat.Backend.Infrastructure.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -80,6 +82,8 @@ public static class DependencyInjection
         services.AddConversationConnectionTracker();
 
         services.AddUserConnectionTracker();
+
+        services.AddFileStorageService();
         
         return services;
     }
@@ -389,6 +393,13 @@ public static class DependencyInjection
     private static IServiceCollection AddUserConnectionTracker(this IServiceCollection services)
     {
         services.AddSingleton<IUserConnectionTracker, UserConnectionTracker>();
+
+        return services;
+    }
+    
+    private static IServiceCollection AddFileStorageService(this IServiceCollection services)
+    {
+        services.AddSingleton<IFileStorageService, LocalFileStorageService>();
 
         return services;
     }

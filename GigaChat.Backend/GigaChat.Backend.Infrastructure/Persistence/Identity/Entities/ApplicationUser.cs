@@ -13,4 +13,6 @@ public class ApplicationUser : IdentityUser, IApplicationUser
     public DateTime? UpdatedAt { get; set; }
     public DateTime? DeletedAt { get; set; }
     public List<RefreshToken> RefreshTokens { get; set; } = [];
+    public string? ProfilePictureUrl { get; set; }
+    public bool AllowGroupInvites { get; set; }
 }

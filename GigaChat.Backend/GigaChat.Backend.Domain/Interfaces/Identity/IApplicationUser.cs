@@ -20,4 +20,7 @@ public interface IApplicationUser
     public DateTime? UpdatedAt { get; set; }
     
     public List<RefreshToken> RefreshTokens { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public string? ProfilePictureUrl { get; set; }
+    public bool AllowGroupInvites { get; set; }
 }

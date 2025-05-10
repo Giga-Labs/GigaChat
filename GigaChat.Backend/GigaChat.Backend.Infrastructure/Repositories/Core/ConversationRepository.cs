@@ -44,4 +44,22 @@ public class ConversationRepository(CoreDbContext coreDbContext) : IConversation
         return await coreDbContext.Conversations
             .AnyAsync(c => c.Id == conversationId, cancellationToken);
     }
+
+    public async Task<Conversation?> FindOneToOneAsync(string userId1, string userId2, CancellationToken cancellationToken = default)
+    {
+        var userIds = new[] { userId1, userId2 };
+
+        var candidateConversations = await coreDbContext.Conversations
+            .Where(c => !c.IsGroup)
+            .Join(coreDbContext.ConversationMembers,
+                c => c.Id,
+                cm => cm.ConversationId,
+                (c, cm) => new { c, cm.UserId })
+            .GroupBy(x => x.c)
+            .Where(g => g.Count() == 2 && userIds.All(id => g.Any(x => x.UserId == id)))
+            .Select(g => g.Key)
+            .ToListAsync(cancellationToken);
+
+        return candidateConversations.FirstOrDefault();
+    }
 }

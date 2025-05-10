@@ -10,4 +10,5 @@ public interface IConversationRepository
     Task UpdateAsync(Conversation conversation, CancellationToken cancellationToken = default);
     Task RemoveAsync(Conversation conversation, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(Guid conversationId, CancellationToken cancellationToken = default);
+    Task<Conversation?> FindOneToOneAsync(string userId1, string userId2, CancellationToken cancellationToken = default);
 }

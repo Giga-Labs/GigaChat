@@ -99,14 +99,16 @@ public class UserRepository(UserManager<ApplicationUser> userManager) : IUserRep
         {
             var result = await userManager.ChangePasswordAsync(applicationUser, currentPassword, newPassword);
 
-            applicationUser.UpdatedAt = DateTime.UtcNow;
-            await userManager.UpdateAsync(applicationUser);
+            if (result.Succeeded)
+            {
+                applicationUser.UpdatedAt = DateTime.UtcNow;
+                await userManager.UpdateAsync(applicationUser);
+            }
 
             return result.Succeeded;
         }
 
-        throw new Exception("Can't use ChangePasswordAsync with non ApplicationUser type objects");
-
+        throw new InvalidOperationException("Can't use ChangePasswordAsync with non-ApplicationUser instances.");
     }
     public async Task<string> GeneratePasswordResetTokenAsync(IApplicationUser user)
     {

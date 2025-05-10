@@ -17,13 +17,13 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
     public async Task<Result<ConversationResponse>> Handle(CreateConversationCommand request, CancellationToken cancellationToken)
     {
         var uniqueIdentifiers = request.MembersList
-        .Where(x => !string.IsNullOrWhiteSpace(x))
-        .Distinct(StringComparer.OrdinalIgnoreCase)
-        .ToList();
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
         var requester = await userRepository.FindByIdAsync(request.RequesterId);
         if (requester is null)
-         return Result.Failure<ConversationResponse>(UserErrors.UserNotFound);
+            return Result.Failure<ConversationResponse>(UserErrors.UserNotFound);
 
         var memberUsers = new List<IApplicationUser>();
 
@@ -37,11 +37,15 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
                 return Result.Failure<ConversationResponse>(UserErrors.UserNotFound);
 
             if (user.Id == request.RequesterId)
-                continue; // skip self
+                continue;
 
             var hasBlockedRequester = await blockedUserRepository.ExistsAsync(user.Id, request.RequesterId, cancellationToken);
-            if (hasBlockedRequester)
-                continue; // skip if user has blocked requester
+            var hasBlockedTarget = await blockedUserRepository.ExistsAsync(request.RequesterId, user.Id, cancellationToken);
+            if (hasBlockedRequester || hasBlockedTarget)
+                continue;
+
+            if (uniqueIdentifiers.Count > 1 && !user.AllowGroupInvites)
+                continue;
 
             memberUsers.Add(user);
         }
@@ -50,9 +54,49 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
             return Result.Failure<ConversationResponse>(ConversationErrors.EmptyParticipantList);
 
         var isGroup = memberUsers.Count > 1;
-        string? name = isGroup
+
+        if (!isGroup)
+        {
+            var hasBlockedExisting = await blockedUserRepository.ExistsAsync(request.RequesterId, memberUsers[0].Id, cancellationToken);
+            var hasBlockedRequesterBack = await blockedUserRepository.ExistsAsync(memberUsers[0].Id, request.RequesterId, cancellationToken);
+
+            if (hasBlockedExisting || hasBlockedRequesterBack)
+                return Result.Failure<ConversationResponse>(ConversationErrors.BlockedUser);
+            
+            var existing = await conversationRepository.FindOneToOneAsync(request.RequesterId, memberUsers[0].Id, cancellationToken);
+            if (existing is not null)
+            {
+                var memberIds = await conversationMemberRepository.GetMembersAsync(existing.Id, cancellationToken);
+                var users = new List<IApplicationUser>();
+
+                foreach (var id in memberIds.Select(m => m.UserId))
+                {
+                    var u = await userRepository.FindByIdAsync(id);
+                    if (u != null) users.Add(u);
+                }
+
+                var existingAdminMap = memberIds.ToDictionary(m => m.UserId, m => m.IsAdmin);
+                var oneToOneResponse = new ConversationResponse(
+                    existing.Id,
+                    existing.Name ?? "",
+                    existing.IsGroup,
+                    existing.AdminId,
+                    users.Select(u => new ReceiverModel(
+                        u.Id,
+                        u.UserName,
+                        u.Email,
+                        u.FirstName,
+                        u.LastName,
+                        existingAdminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin)).ToList()
+                );
+
+                return Result.Success(oneToOneResponse);
+            }
+        }
+
+        var name = isGroup
             ? (request.Name ?? $"Group Chat with {memberUsers.Count + 1} people")
-            : memberUsers.First().FirstName + " " + memberUsers.First().LastName;
+            : $"{memberUsers.First().FirstName} {memberUsers.First().LastName}";
 
         var conversation = new Conversation
         {
@@ -104,7 +148,7 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
 
         var allMembers = new List<IApplicationUser> { requester };
         allMembers.AddRange(memberUsers);
-        
+
         var adminMap = members.ToDictionary(m => m.UserId, m => m.IsAdmin);
 
         var response = new ConversationResponse(
@@ -122,7 +166,7 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
                     adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin))
                 .ToList()
         );
-        
+
         await Task.WhenAll(allMembers.Select(m =>
             conversationBroadcaster.BroadcastNewConversationAsync(m.Id, response)));
 
