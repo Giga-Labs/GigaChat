@@ -4,6 +4,7 @@ using GigaChat.Backend.Application.Features.Conversations.Contracts;
 using GigaChat.Backend.Application.Models;
 using GigaChat.Backend.Application.Repositories.Core;
 using GigaChat.Backend.Application.Repositories.Identity;
+using GigaChat.Backend.Application.Services.Hubs;
 using GigaChat.Backend.Domain.Abstractions;
 using GigaChat.Backend.Domain.Entities.Core;
 using GigaChat.Backend.Domain.Interfaces.Identity;
@@ -11,7 +12,7 @@ using MediatR;
 
 namespace GigaChat.Backend.Application.Features.Conversations.Handler;
 
-public class CreateConversationCommandHandler(IUserRepository userRepository, IConversationRepository conversationRepository, IConversationMemberRepository conversationMemberRepository, IConversationInviteLogRepository conversationInviteLogRepository, IBlockedUserRepository blockedUserRepository) : IRequestHandler<CreateConversationCommand, Result<ConversationResponse>>
+public class CreateConversationCommandHandler(IUserRepository userRepository, IConversationRepository conversationRepository, IConversationMemberRepository conversationMemberRepository, IConversationInviteLogRepository conversationInviteLogRepository, IBlockedUserRepository blockedUserRepository, IConversationBroadcaster conversationBroadcaster) : IRequestHandler<CreateConversationCommand, Result<ConversationResponse>>
 {
     public async Task<Result<ConversationResponse>> Handle(CreateConversationCommand request, CancellationToken cancellationToken)
     {
@@ -103,6 +104,8 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
 
         var allMembers = new List<IApplicationUser> { requester };
         allMembers.AddRange(memberUsers);
+        
+        var adminMap = members.ToDictionary(m => m.UserId, m => m.IsAdmin);
 
         var response = new ConversationResponse(
             conversation.Id,
@@ -110,9 +113,18 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
             conversation.IsGroup,
             conversation.AdminId,
             allMembers
-                .Select(u => new ReceiverModel(u.Id, u.UserName, u.Email, u.FirstName, u.LastName))
+                .Select(u => new ReceiverModel(
+                    u.Id,
+                    u.UserName,
+                    u.Email,
+                    u.FirstName,
+                    u.LastName,
+                    adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin))
                 .ToList()
         );
+        
+        await Task.WhenAll(allMembers.Select(m =>
+            conversationBroadcaster.BroadcastNewConversationAsync(m.Id, response)));
 
         return Result.Success(response);
     }

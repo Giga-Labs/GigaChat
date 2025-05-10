@@ -9,5 +9,8 @@ public class AcceptConversationRequestValidator : AbstractValidator<AcceptConver
     {
         RuleFor(req => req.Accept)
             .NotNull();
+
+        RuleFor(req => req.ConnectionId)
+            .NotEmpty();
     }
 }

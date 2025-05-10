@@ -10,6 +10,16 @@ namespace GigaChat.Backend.Api.Hubs;
 [Authorize]
 public class ConversationHub(IMediator mediator, IConversationConnectionTracker tracker) : Hub
 {
+    public async Task SubscribeToConversationUpdates()
+    {
+        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userId)) return;
+
+        var connectionId = Context.ConnectionId;
+
+        await mediator.Send(new SubscribeToConversationUpdatesCommand(connectionId, userId));
+    }
+    
     public async Task SubscribeToConversations(Guid conversationId)
     {
         var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;

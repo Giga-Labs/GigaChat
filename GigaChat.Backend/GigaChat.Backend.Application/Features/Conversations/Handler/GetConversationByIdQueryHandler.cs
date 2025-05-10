@@ -22,14 +22,23 @@ public class GetConversationByIdQueryHandler(IConversationRepository conversatio
         if (!isMember)
             return Result.Failure<ConversationResponse>(ConversationErrors.AccessDenied);
 
-        var memberIds = await conversationMemberRepository.GetMembersAsync(request.ConversationId, cancellationToken);
-        var members = new List<IApplicationUser>();
+        var memberEntities = await conversationMemberRepository.GetMembersAsync(request.ConversationId, cancellationToken);
+        
+        var responses = new List<ReceiverModel>();
 
-        foreach (var member in memberIds)
+        foreach (var member in memberEntities)
         {
             var user = await userRepository.FindByIdAsync(member.UserId);
-            if (user is not null)
-                members.Add(user);
+            if (user is null) continue;
+
+            responses.Add(new ReceiverModel(
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.FirstName,
+                user.LastName,
+                member.IsAdmin
+            ));
         }
 
         var response = new ConversationResponse(
@@ -37,7 +46,7 @@ public class GetConversationByIdQueryHandler(IConversationRepository conversatio
             conversation.Name ?? "",
             conversation.IsGroup,
             conversation.AdminId,
-            members.Select(u => new ReceiverModel(u.Id, u.UserName, u.Email, u.FirstName, u.LastName)).ToList()
+            responses
         );
 
         return Result.Success(response);

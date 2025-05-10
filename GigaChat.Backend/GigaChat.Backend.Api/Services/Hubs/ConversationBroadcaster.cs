@@ -14,11 +14,11 @@ public class ConversationBroadcaster(IHubContext<ConversationHub> hubContext) : 
             .SendAsync("NewConversation", response);
     }
 
-    public Task BroadcastConversationDeletedAsync(string userId, Guid conversationId)
+    public Task BroadcastConversationRemovedAsync(string userId, Guid conversationId)
     {
         return hubContext.Clients
             .Group($"user-{userId}")
-            .SendAsync("ConversationDeleted", conversationId);
+            .SendAsync("ConversationRemoved", conversationId);
     }
 
     public Task BroadcastConversationUpdatedAsync(string userId, ConversationResponse response)

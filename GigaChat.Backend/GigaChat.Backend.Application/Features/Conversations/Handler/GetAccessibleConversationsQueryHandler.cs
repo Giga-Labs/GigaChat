@@ -33,15 +33,23 @@ public class GetAccessibleConversationsQueryHandler(IConversationRepository conv
                 if (user != null)
                     userModels.Add(user);
             }
+            
+            var adminMap = members.ToDictionary(m => m.UserId, m => m.IsAdmin);
 
             var convoResponse = new ConversationResponse(
                 conversation.Id,
                 conversation.Name ?? "",
                 conversation.IsGroup,
                 conversation.AdminId,
-                userModels.Select(u =>
-                    new ReceiverModel(u.Id, u.UserName, u.Email, u.FirstName, u.LastName)
-                ).ToList()
+                userModels.Select(u => new ReceiverModel(
+                    u.Id,
+                    u.UserName,
+                    u.Email,
+                    u.FirstName,
+                    u.LastName,
+                    adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin
+                ))
+                .ToList()
             );
 
             conversations.Add(convoResponse);

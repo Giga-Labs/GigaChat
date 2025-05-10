@@ -30,6 +30,9 @@ public static class ErrorMappings
         "Conversation.InviteRejected" => StatusCodes.Status400BadRequest,
         "Conversation.NotGroupAdmin" => StatusCodes.Status403Forbidden,
         "Conversation.InviteNotFound" => StatusCodes.Status404NotFound,
+        "Conversation.CannotModifySelf" => StatusCodes.Status403Forbidden,
+        "Conversation.TargetNotMember" => StatusCodes.Status400BadRequest,
+        "Conversation.CannotRemoveFromPrivateChat" => StatusCodes.Status403Forbidden,
         _ => StatusCodes.Status400BadRequest // Default case
     };
 }

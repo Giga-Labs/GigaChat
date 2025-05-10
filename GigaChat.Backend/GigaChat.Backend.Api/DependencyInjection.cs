@@ -47,6 +47,10 @@ public static class DependencyInjection
         services.AddScoped<IConversationHubNotifier, ConversationHubNotifier>();
 
         services.AddScoped<IMessageHubNotifier, MessageHubNotifier>();
+        
+        services.AddScoped<IConversationBroadcaster, ConversationBroadcaster>();
+        
+        services.AddScoped<IMessageBroadcaster, MessageBroadcaster>();
 
         return services;
     }

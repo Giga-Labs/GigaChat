@@ -1,3 +1,3 @@
 namespace GigaChat.Backend.Application.Features.Conversations.Contracts;
 
-public record AcceptConversationRequest(bool Accept, string ConnectionId);
+public record ToggleAdminStatusResponse(string UserId, bool IsAdmin);

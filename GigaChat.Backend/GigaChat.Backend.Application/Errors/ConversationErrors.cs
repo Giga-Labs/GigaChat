@@ -39,4 +39,13 @@ public static class ConversationErrors
     
     public static readonly Error NotFound =
         new("Conversation.NotFound", "No conversation found with this specified id.");
+    
+    public static readonly Error CannotModifySelf =
+        new("Conversation.CannotModifySelf", "You cannot modify your own admin status.");
+
+    public static readonly Error TargetNotMember =
+        new("Conversation.TargetNotMember", "The target user is not a member of the conversation.");
+    
+    public static readonly Error CannotRemoveFromPrivateChat =
+        new("Conversation.CannotRemoveFromPrivateChat", "Cannot remove users from a private chat.");
 }

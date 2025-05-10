@@ -3,10 +3,8 @@ using MediatR;
 
 namespace GigaChat.Backend.Application.Features.Conversations.Commands;
 
-public record AcceptConversationCommand
-(
+public record RemoveUserFromConversationCommand(
     string RequesterId,
     Guid ConversationId,
-    bool Accept,
-    string ConnectionId
+    string TargetUserId
 ) : IRequest<Result>;

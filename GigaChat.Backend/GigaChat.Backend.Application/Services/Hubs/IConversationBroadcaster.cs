@@ -5,6 +5,6 @@ namespace GigaChat.Backend.Application.Services.Hubs;
 public interface IConversationBroadcaster
 {
     Task BroadcastNewConversationAsync(string userId, ConversationResponse response);
-    Task BroadcastConversationDeletedAsync(string userId, Guid conversationId);
+    Task BroadcastConversationRemovedAsync(string userId, Guid conversationId);
     Task BroadcastConversationUpdatedAsync(string userId, ConversationResponse response);
 }

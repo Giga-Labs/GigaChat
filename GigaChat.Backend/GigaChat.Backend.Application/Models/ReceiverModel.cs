@@ -6,5 +6,6 @@ public record ReceiverModel
   string UserName,
   string Email,
   string FirstName,
-  string LastName
+  string LastName,
+  bool IsAdmin
 );

@@ -15,4 +15,14 @@ public class ConversationHubNotifier(IHubContext<ConversationHub> hubContext) : 
     {
         await hubContext.Groups.RemoveFromGroupAsync(connectionId, $"conversation-{conversationId}");
     }
+
+    public async Task AddPrivateConnectionAsync(string connectionId, string userId)
+    {
+        await hubContext.Groups.AddToGroupAsync(connectionId, $"user-{userId}");
+    }
+    
+    public async Task RemovePrivateConnectionAsync(string connectionId, string userId)
+    {
+        await hubContext.Groups.RemoveFromGroupAsync(connectionId, $"user-{userId}");
+    }
 }

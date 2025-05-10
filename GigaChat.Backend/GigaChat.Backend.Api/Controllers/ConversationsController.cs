@@ -7,7 +7,6 @@ using GigaChat.Backend.Application.Features.Conversations.Queries;
 using GigaChat.Backend.Domain.Abstractions;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GigaChat.Backend.Api.Controllers
@@ -20,11 +19,11 @@ namespace GigaChat.Backend.Api.Controllers
         [HttpPost("")]
         public async Task<IActionResult> CreateAsync([FromBody] CreateConversationRequest request, CancellationToken cancellationToken = default)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
                 return Result.Failure(TokenErrors.InvalidToken).ToProblem(TokenErrors.InvalidToken.ToStatusCode());
 
-            var command = new CreateConversationCommand(userId, request.Name, request.MembersList);
+            var command = new CreateConversationCommand(requesterId, request.Name, request.MembersList);
             var result = await mediator.Send(command, cancellationToken);
 
             return result.Succeeded ? CreatedAtAction(nameof(GetById), new { conversationId = result.Value.Id }, result.Value) : result.ToProblem(result.Error.ToStatusCode());
@@ -34,11 +33,11 @@ namespace GigaChat.Backend.Api.Controllers
         public async Task<IActionResult> AcceptAsync([FromRoute] Guid conversationId,
             [FromBody] AcceptConversationRequest request, CancellationToken cancellationToken = default)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
                 return Result.Failure(TokenErrors.InvalidToken).ToProblem(TokenErrors.InvalidToken.ToStatusCode());
 
-            var command = new AcceptConversationCommand(userId, conversationId, request.Accept);
+            var command = new AcceptConversationCommand(requesterId, conversationId, request.Accept, request.ConnectionId);
             var result = await mediator.Send(command, cancellationToken);
 
             return result.Succeeded ? Ok() : result.ToProblem(result.Error.ToStatusCode());
@@ -48,11 +47,11 @@ namespace GigaChat.Backend.Api.Controllers
         public async Task<IActionResult> GetById([FromRoute] Guid conversationId,
             CancellationToken cancellationToken = default)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
                 return Result.Failure(TokenErrors.InvalidToken).ToProblem(TokenErrors.InvalidToken.ToStatusCode());
 
-            var query = new GetConversationByIdQuery(userId, conversationId);
+            var query = new GetConversationByIdQuery(requesterId, conversationId);
             var result = await mediator.Send(query, cancellationToken);
 
             return result.Succeeded ? Ok(result.Value) : result.ToProblem(result.Error.ToStatusCode());
@@ -61,14 +60,55 @@ namespace GigaChat.Backend.Api.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userId))
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
                 return Result.Failure(TokenErrors.InvalidToken).ToProblem(TokenErrors.InvalidToken.ToStatusCode());
 
-            var query = new GetAccessibleConversationsQuery(userId);
+            var query = new GetAccessibleConversationsQuery(requesterId);
             var result = await mediator.Send(query, cancellationToken);
 
             return result.Succeeded ? Ok(result.Value) : result.ToProblem(result.Error.ToStatusCode());
+        }
+
+        [HttpDelete("{conversationId}")]
+        public async Task<IActionResult> RemoveAsync([FromRoute] Guid conversationId,
+            CancellationToken cancellationToken = default)
+        {
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
+                return Result.Failure(TokenErrors.InvalidToken).ToProblem(TokenErrors.InvalidToken.ToStatusCode());
+
+            var command = new RemoveConversationCommand(requesterId, conversationId);
+            var result = await mediator.Send(command, cancellationToken);
+
+            return result.Succeeded ? NoContent() : result.ToProblem(result.Error.ToStatusCode());
+        }
+
+        [HttpPut("{conversationId}/members/{userId}/admin")]
+        public async Task<IActionResult> ToggleAdminAsync([FromRoute] Guid conversationId, [FromRoute] string userId,
+            CancellationToken cancellationToken = default)
+        {
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
+                return Result.Failure(TokenErrors.InvalidToken).ToProblem(TokenErrors.InvalidToken.ToStatusCode());
+
+            var command = new ToggleAdminStatusCommand(requesterId, conversationId, userId);
+            var result = await mediator.Send(command, cancellationToken);
+
+            return result.Succeeded ? Ok(result.Value) : result.ToProblem(result.Error.ToStatusCode());
+        }
+        
+        [HttpDelete("{conversationId}/members/{userId}")]
+        public async Task<IActionResult> RemoveMember([FromRoute] Guid conversationId, [FromRoute] string userId, CancellationToken cancellationToken = default)
+        {
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
+                return Unauthorized();
+
+            var command = new RemoveUserFromConversationCommand(requesterId, conversationId, userId);
+            var result = await mediator.Send(command, cancellationToken);
+
+            return result.Succeeded ? NoContent() : result.ToProblem(result.Error.ToStatusCode());
         }
     }
 }
