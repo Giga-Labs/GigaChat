@@ -46,9 +46,15 @@ public class RemoveUserFromConversationCommandHandler(IConversationRepository co
             conversation.Name ?? "",
             conversation.IsGroup,
             conversation.AdminId,
-            users.Select(u => new ReceiverModel(u.Id, u.UserName, u.Email, u.FirstName, u.LastName, 
-                    remainingMembers.Any(m => m.UserId == u.Id && m.IsAdmin)))
-                .ToList()
+            users.Select(u => new ReceiverModel(
+                u.Id,
+                u.UserName,
+                u.Email,
+                u.FirstName,
+                u.LastName,
+                remainingMembers.Any(m => m.UserId == u.Id && m.IsAdmin),
+                u.ProfilePictureUrl // Add this so the model doesn’t cry
+            )).ToList()
         );
 
         await Task.WhenAll(users.Select(user =>

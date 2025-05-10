@@ -7,5 +7,6 @@ public record ReceiverModel
   string Email,
   string FirstName,
   string LastName,
-  bool IsAdmin
+  bool IsAdmin,
+  string? ProfilePictureUrl
 );

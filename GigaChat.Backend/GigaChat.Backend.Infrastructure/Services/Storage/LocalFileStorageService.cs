@@ -19,4 +19,19 @@ public class LocalFileStorageService(IWebHostEnvironment webHostEnvironment) : I
 
         return $"/pfp/{fileName}";
     }
+
+    public async Task<string> UploadMessageAttachmentAsync(string userId, Guid conversationId, IFormFile file)
+    {
+        var folder = Path.Combine(webHostEnvironment.WebRootPath ?? "wwwroot", "attachments",
+            conversationId.ToString());
+        Directory.CreateDirectory(folder);
+
+        var safeFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        var filePath = Path.Combine(folder, safeFileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        return $"/attachments/{conversationId}/{safeFileName}";
+    }
 }

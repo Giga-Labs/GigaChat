@@ -37,7 +37,8 @@ public class GetConversationByIdQueryHandler(IConversationRepository conversatio
                 user.Email,
                 user.FirstName,
                 user.LastName,
-                member.IsAdmin
+                member.IsAdmin,
+                user.ProfilePictureUrl
             ));
         }
 

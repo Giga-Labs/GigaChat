@@ -19,16 +19,6 @@ public class ConversationHub(IMediator mediator, IConversationConnectionTracker 
 
         await mediator.Send(new SubscribeToConversationUpdatesCommand(connectionId, userId));
     }
-    
-    public async Task SubscribeToConversations(Guid conversationId)
-    {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrWhiteSpace(userId)) return;
-
-        var connectionId = Context.ConnectionId;
-
-        await mediator.Send(new SubscribeToConversationCommand(conversationId, connectionId, userId));
-    }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {

@@ -47,9 +47,9 @@ public class GetAccessibleConversationsQueryHandler(IConversationRepository conv
                     u.Email,
                     u.FirstName,
                     u.LastName,
-                    adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin
-                ))
-                .ToList()
+                    adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin,
+                    u.ProfilePictureUrl
+                )).ToList()
             );
 
             conversations.Add(convoResponse);

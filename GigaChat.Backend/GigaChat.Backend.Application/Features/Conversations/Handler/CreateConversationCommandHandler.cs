@@ -87,7 +87,9 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
                         u.Email,
                         u.FirstName,
                         u.LastName,
-                        existingAdminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin)).ToList()
+                        existingAdminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin,
+                        u.ProfilePictureUrl // Don't leave them faceless
+                    )).ToList()
                 );
 
                 return Result.Success(oneToOneResponse);
@@ -163,7 +165,9 @@ public class CreateConversationCommandHandler(IUserRepository userRepository, IC
                     u.Email,
                     u.FirstName,
                     u.LastName,
-                    adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin))
+                    adminMap.TryGetValue(u.Id, out var isAdmin) && isAdmin,
+                    u.ProfilePictureUrl // <-- Don't ghost this field
+                ))
                 .ToList()
         );
 

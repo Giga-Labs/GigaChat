@@ -56,7 +56,9 @@ public class ToggleAdminStatusCommandHandler(IConversationMemberRepository membe
                     u.Email,
                     u.FirstName,
                     u.LastName,
-                    members.First(m => m.UserId == u.Id).IsAdmin)
+                    members.First(m => m.UserId == u.Id).IsAdmin,
+                    u.ProfilePictureUrl // <- Don't forget this guy
+                )
             ).ToList()
         );
 

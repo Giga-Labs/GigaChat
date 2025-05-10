@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <Folder Include="Features\Block\Validators\" />
+      <Folder Include="Features\Messages\Queries\" />
       <Folder Include="Features\Profile\Queries\" />
     </ItemGroup>
 
