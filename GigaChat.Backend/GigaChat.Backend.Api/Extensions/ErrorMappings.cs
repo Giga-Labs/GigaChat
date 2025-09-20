@@ -35,6 +35,7 @@ public static class ErrorMappings
         "Conversation.CannotRemoveFromPrivateChat" => StatusCodes.Status403Forbidden,
         "Block.SelfBlock" => StatusCodes.Status403Forbidden,
         "Conversation.BlockedUser" => StatusCodes.Status403Forbidden,
+        "Conversation.InvalidGroup" => StatusCodes.Status400BadRequest,
         _ => StatusCodes.Status400BadRequest // Default case
     };
 }

@@ -49,4 +49,5 @@ public static class ConversationErrors
     public static readonly Error CannotRemoveFromPrivateChat =
         new("Conversation.CannotRemoveFromPrivateChat", "Cannot remove users from a private chat.");
     public static readonly Error BlockedUser = new("Conversation.BlockedUser", "Cannot create or access a conversation with a blocked user.");
+    public static readonly Error InvalidGroup = new("Conversation.InvalidGroup", "This action is only allowed for group conversations.");
 }

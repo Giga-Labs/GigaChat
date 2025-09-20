@@ -4,7 +4,7 @@ public class EmailBodyBuilder
 {
     public static string GenerateEmailBody(string template, Dictionary<string, string> templateModel)
     {
-        var templatePath = $"../GigaChat/Templates/{template}.html";
+        var templatePath = $"../GigaChat.Backend.Infrastructure/Templates/{template}.html";
         var streamReader = new StreamReader(templatePath);
         var body = streamReader.ReadToEnd();
         streamReader.Close();
