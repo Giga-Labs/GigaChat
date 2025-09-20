@@ -123,5 +123,18 @@ namespace GigaChat.Backend.Api.Controllers
             
             return result.Succeeded ? NoContent() : result.ToProblem(result.Error.ToStatusCode());
         }
+
+        [HttpPost("{conversationId}/members")]
+        public async Task<IActionResult> AddMember([FromRoute] Guid conversationId, [FromBody] AddConversationMemberRequest request, CancellationToken cancellationToken = default)
+        {
+            var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(requesterId))
+                return Unauthorized();
+
+            var command = new AddConversationMembersCommand(requesterId, conversationId, request.MembersList);
+            var result = await mediator.Send(command, cancellationToken);
+            
+            return result.Succeeded ? Ok(result.Value) : result.ToProblem(result.Error.ToStatusCode());
+        }
     }
 }

@@ -16,6 +16,6 @@ public static class UserErrors
     public static readonly Error ResetPasswordFailed = new("User.ResetPasswordFailed", "Reset password failed.");
     public static readonly Error InvalidPasswordResetOtp = new("User.InvalidPasswordResetOtp", "Invalid or expired OTP.");
     public static readonly Error InvalidPasswordResetToken = new("User.InvalidPasswordResetToken", "Invalid or expired password reset token.");
-    public static readonly Error PasswordChangeFailed =
-        new("User.PasswordChangeFailed", "Failed to change the user's password. Please try again.");
+    public static readonly Error PasswordChangeFailed = new("User.PasswordChangeFailed", "Failed to change the user's password. Please try again.");
+    
 }

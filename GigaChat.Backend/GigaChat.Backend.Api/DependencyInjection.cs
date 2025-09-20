@@ -32,13 +32,12 @@ public static class DependencyInjection
         {
             options.AddPolicy("AllowSpecificOrigin", builder =>
             {
-                builder.WithOrigins("http://localhost:5173", "https://gigachat.vercel.app", "https://gigachat.tech") 
+                builder.WithOrigins("http://localhost:5173", "https://www.gigachat.tech", "https://gigachat.tech") 
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
             });
         });
-
         return services;
     }
     

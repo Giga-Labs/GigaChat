@@ -31,7 +31,7 @@ if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Api
     app.MapScalarApiReference();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "Agrivision API");
+        options.SwaggerEndpoint("/openapi/v1.json", "GigaChat API");
         options.RoutePrefix = "swagger";
     });
 }
