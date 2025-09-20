@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigaChat.Backend.Api", "GigaChat.Backend.Api\GigaChat.Backend.Api.csproj", "{2568AB35-5FB5-4D40-8667-05A3B9AD54E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigaChat.Backend.Domain", "GigaChat.Backend.Domain\GigaChat.Backend.Domain.csproj", "{46F21B9A-026B-47B3-89E3-1E1996FCA492}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigaChat.Backend.Application", "GigaChat.Backend.Application\GigaChat.Backend.Application.csproj", "{8F8B1A44-B90B-46D4-B52D-A403B1981ECD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GigaChat.Backend.Infrastructure", "GigaChat.Backend.Infrastructure\GigaChat.Backend.Infrastructure.csproj", "{B8ACE7C2-08CE-4B75-98DA-DDC32D8D4CD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2568AB35-5FB5-4D40-8667-05A3B9AD54E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2568AB35-5FB5-4D40-8667-05A3B9AD54E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2568AB35-5FB5-4D40-8667-05A3B9AD54E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2568AB35-5FB5-4D40-8667-05A3B9AD54E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46F21B9A-026B-47B3-89E3-1E1996FCA492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46F21B9A-026B-47B3-89E3-1E1996FCA492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46F21B9A-026B-47B3-89E3-1E1996FCA492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46F21B9A-026B-47B3-89E3-1E1996FCA492}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F8B1A44-B90B-46D4-B52D-A403B1981ECD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F8B1A44-B90B-46D4-B52D-A403B1981ECD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F8B1A44-B90B-46D4-B52D-A403B1981ECD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F8B1A44-B90B-46D4-B52D-A403B1981ECD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8ACE7C2-08CE-4B75-98DA-DDC32D8D4CD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8ACE7C2-08CE-4B75-98DA-DDC32D8D4CD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8ACE7C2-08CE-4B75-98DA-DDC32D8D4CD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8ACE7C2-08CE-4B75-98DA-DDC32D8D4CD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
